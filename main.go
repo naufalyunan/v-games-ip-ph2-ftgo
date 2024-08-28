@@ -15,6 +15,7 @@ func main() {
 	e := echo.New()
 	u := e.Group("/users")
 	u.POST("/register", handlers.Register)
+	u.POST("/login", handlers.Login)
 
 	port := os.Getenv("PORT")
 	if port == "" {

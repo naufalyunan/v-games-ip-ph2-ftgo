@@ -4,13 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 	"v-games-ip-ph2-ftgo/config"
 	"v-games-ip-ph2-ftgo/models"
 	"v-games-ip-ph2-ftgo/utils"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -142,5 +145,54 @@ func Register(c echo.Context) error {
 			Deposit:      user.Deposit,
 			ReferralCode: coupon.Code,
 		},
+	})
+}
+
+func Login(c echo.Context) error {
+	var loginPayload models.LoginPayload
+	if err := c.Bind(&loginPayload); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError(err.Error()))
+	}
+
+	if loginPayload.Email == "" {
+		return utils.HandleError(c, utils.NewBadRequestError("Email must not be empty"))
+	}
+
+	if loginPayload.Password == "" {
+		return utils.HandleError(c, utils.NewBadRequestError("Password must not be empty"))
+	}
+
+	//find user by email
+	var user models.User
+	if err := config.DB.Where("email = ?", loginPayload.Email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return utils.HandleError(c, utils.NewNotFoundError("User not found"))
+		}
+		return utils.HandleError(c, utils.NewInternalError("Internal Server Error"))
+	}
+
+	//verify the password if the result exist
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginPayload.Password)); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError("Invalid Email/Password"))
+	}
+	key := os.Getenv("KEY")
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"id":        user.ID,
+			"email":     user.Email,
+			"full_name": user.FullName,
+		})
+	s, err := t.SignedString([]byte(key))
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError("Internal Server Error"))
+	}
+
+	//update the last_login_date and jwt_token
+	if err := config.DB.Model(&user).Updates(map[string]interface{}{"jwt_token": s}).Error; err != nil {
+		return utils.HandleError(c, utils.NewInternalError("Internal server error"))
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"token": s,
 	})
 }
