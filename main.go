@@ -17,6 +17,10 @@ func main() {
 	u.POST("/register", handlers.Register)
 	u.POST("/login", handlers.Login)
 
+	g := e.Group("/games")
+	g.GET("", handlers.GetGames)
+	g.GET("/:id", handlers.GetGameByID)
+	g.PUT("/:id", handlers.UpdateGameStock)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
