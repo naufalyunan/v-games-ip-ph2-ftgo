@@ -20,6 +20,7 @@ func main() {
 
 	g := e.Group("/games")
 	g.GET("", handlers.GetGames)
+	g.POST("", handlers.CreateGame)
 	g.GET("/:id", handlers.GetGameByID)
 	g.PUT("/:id", handlers.UpdateGameStock)
 

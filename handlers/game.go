@@ -23,6 +23,51 @@ func GetGames(c echo.Context) error {
 	})
 }
 
+func CreateGame(c echo.Context) error {
+	var game models.Game
+	if err := c.Bind(&game); err != nil {
+		return utils.HandleError(c, utils.NewBadRequestError("Invalid input"))
+	}
+
+	if game.Name == "" {
+		return utils.HandleError(c, utils.NewBadRequestError("Name must not be empty"))
+	}
+
+	if game.Description == "" {
+		return utils.HandleError(c, utils.NewBadRequestError("Description must not be empty"))
+	}
+
+	if game.RentPrice == 0 {
+		return utils.HandleError(c, utils.NewBadRequestError("Rent Price must not be empty"))
+	}
+
+	if game.RentPrice < 0 {
+		return utils.HandleError(c, utils.NewBadRequestError("Rent Price must be a positive value"))
+	}
+
+	if game.Studio == "" {
+		return utils.HandleError(c, utils.NewBadRequestError("Studio must not be empty"))
+	}
+
+	if game.Stock == 0 {
+		return utils.HandleError(c, utils.NewBadRequestError("Stock must not be empty"))
+	}
+
+	if game.Stock < 0 {
+		return utils.HandleError(c, utils.NewBadRequestError("Stock must be a positive number"))
+	}
+
+	//create game
+	if err := config.DB.Create(&game).Error; err != nil {
+		return utils.HandleError(c, utils.NewInternalError("Internal server error"))
+	}
+
+	return c.JSON(http.StatusCreated, models.Response{
+		Message: "Success add game with ID " + fmt.Sprintf("%d", game.ID),
+		Data:    game,
+	})
+}
+
 func GetGameByID(c echo.Context) error {
 	gameID := c.Param("id")
 
