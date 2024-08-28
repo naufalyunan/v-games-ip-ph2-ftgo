@@ -4,6 +4,7 @@ import (
 	"os"
 	"v-games-ip-ph2-ftgo/config"
 	"v-games-ip-ph2-ftgo/handlers"
+	"v-games-ip-ph2-ftgo/middlewares"
 
 	"github.com/labstack/echo/v4"
 )
@@ -21,6 +22,11 @@ func main() {
 	g.GET("", handlers.GetGames)
 	g.GET("/:id", handlers.GetGameByID)
 	g.PUT("/:id", handlers.UpdateGameStock)
+
+	r := e.Group("/reviews")
+	r.GET("", handlers.GetReviews)
+	r.Use(middlewares.IsAuthenticated())
+	r.POST("", handlers.CreateReview)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

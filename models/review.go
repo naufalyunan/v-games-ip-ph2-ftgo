@@ -10,6 +10,6 @@ type Review struct {
 	Message string  `gorm:"type:varchar(250); not null" json:"message"`
 
 	//Assc
-	User User `gorm:"foreignKey:UserID;references:ID" json:"-"`
-	Game Game `gorm:"foreignKey:GameID;references:ID" json:"-"`
+	User *User `gorm:"foreignKey:UserID;references:ID" json:"User,omitempty"`
+	Game *Game `gorm:"foreignKey:GameID;references:ID" json:"Game,omitempty"`
 }
