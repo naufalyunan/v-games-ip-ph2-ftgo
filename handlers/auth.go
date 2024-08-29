@@ -36,8 +36,35 @@ func Register(c echo.Context) error {
 		return utils.HandleError(c, utils.NewBadRequestError("Password must not be empty"))
 	}
 
+	if user.Role == "" {
+		user.Role = "user"
+	}
+
 	//initial deposit value is 0
 	user.Deposit = 0
+
+	if user.Role == "admin" {
+		user.InputRefCode = ""
+		if err := config.DB.Create(&user).Error; err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+				return utils.NewBadRequestError("Email or username already registered")
+			}
+			return utils.NewInternalError(err.Error())
+		}
+
+		return c.JSON(http.StatusCreated, models.Response{
+			Message: "Success create admin with ID " + fmt.Sprintf("%d", user.ID),
+			Note:    "Created admin account",
+			Data: models.ResponseDataRegister{
+				ID:       user.ID,
+				FullName: user.FullName,
+				Email:    user.Email,
+			},
+		})
+	}
+
+	//if not admin
 	var coupon models.CouponCode
 	if err := config.DB.Transaction(func(tx *gorm.DB) error {
 
@@ -181,6 +208,7 @@ func Login(c echo.Context) error {
 			"id":        user.ID,
 			"email":     user.Email,
 			"full_name": user.FullName,
+			"role":      user.Role,
 		})
 	s, err := t.SignedString([]byte(key))
 	if err != nil {

@@ -14,6 +14,7 @@ type User struct {
 	Deposit      float64 `gorm:"type:float;not null;default:0;check:deposit >= 0" json:"deposit"`
 	JWTToken     string  `gorm:"type:varchar(250)" json:"jwt_token"`
 	InputRefCode string  `gorm:"type:VARCHAR(250)" json:"input_ref_code"`
+	Role         string  `gorm:"type:VARCHAR(250)" json:"role"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func IsAuthenticated() echo.MiddlewareFunc {
+func IsAuthenticated(role string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			jwtSecret := os.Getenv("KEY")
@@ -33,10 +33,25 @@ func IsAuthenticated() echo.MiddlewareFunc {
 			}
 
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+				userRole := claims["role"].(string)
+
+				// Otorisasi berdasarkan role
+				if role == "admin" && userRole != "admin" {
+					return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for non-admin"})
+				}
+
+				if role == "user" && userRole != "user" {
+					return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for non-staff"})
+				}
+
+				// Set token di konteks untuk digunakan di handler
 				c.Set("user_id", claims["id"])
 				c.Set("email", claims["email"])
+
+				return next(c)
+			} else {
+				return utils.HandleError(c, utils.NewUnauthorizedError("Invalid token claims"))
 			}
-			return next(c)
 		}
 	}
 }

@@ -10,6 +10,6 @@ type ResponseDataRegister struct {
 	ID           uint    `json:"id"`
 	FullName     string  `json:"full_name"`
 	Email        string  `json:"email"`
-	Deposit      float64 `json:"deposit"`
-	ReferralCode string  `json:"referral_code"`
+	Deposit      float64 `json:"deposit,omitempty"`
+	ReferralCode string  `json:"referral_code,omitempty"`
 }
