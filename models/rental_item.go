@@ -9,6 +9,6 @@ type RentalItem struct {
 	Status     string `gorm:"type:varchar(250);not null" json:"status"`
 
 	//Assc
-	Rental   Rental   `gorm:"foreignKey:RentalID;references:ID" json:"-"`
-	CartItem CartItem `gorm:"foreignKey:CartItemID;references:ID" json:"-"`
+	Rental   *Rental   `gorm:"foreignKey:RentalID;references:ID" json:"rental,omitempty"`
+	CartItem *CartItem `gorm:"foreignKey:CartItemID;references:ID" json:"cart_item,omitempty"`
 }

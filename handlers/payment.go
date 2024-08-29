@@ -113,3 +113,41 @@ func CreatePayment(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, response)
 }
+
+func GetPayments(c echo.Context) error {
+	userID, ok := c.Get("user_id").(float64)
+	if !ok {
+		return utils.HandleError(c, utils.NewBadRequestError("Invalid user ID"))
+	}
+
+	userRole, ok := c.Get("role").(string)
+	if !ok {
+		return utils.HandleError(c, utils.NewBadRequestError("Invalid user role"))
+	}
+
+	var payments []models.Payment
+
+	if userRole == "user" {
+		// Convert float64 userID to uint as needed
+		uid := uint(userID)
+
+		if err := config.DB.Joins("JOIN carts ON carts.id = payments.cart_id").
+			Where("carts.user_id = ?", uid).
+			Preload("Cart").
+			Preload("Cart.CartItems").
+			Find(&payments).Error; err != nil {
+			return utils.HandleError(c, utils.NewInternalError("Internal server error"))
+		}
+	} else if userRole == "admin" {
+		if err := config.DB.Preload("Cart").
+			Preload("Cart.CartItems").
+			Find(&payments).Error; err != nil {
+			return utils.HandleError(c, utils.NewInternalError("Internal server error"))
+		}
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Message: "Success getting payments",
+		Data:    payments,
+	})
+}

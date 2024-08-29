@@ -45,12 +45,22 @@ func main() {
 	co.GET("/referral", handlers.GetReferralCode)
 
 	p := e.Group("/payments")
+	p.Use(middlewares.IsAuthenticated("both"))
+	p.GET("", handlers.GetPayments)
 	p.Use(middlewares.IsAuthenticated("user"))
 	p.POST("/create", handlers.CreatePayment)
 
 	pay := e.Group("/pay")
 	pay.Use(middlewares.IsAuthenticated("admin"))
 	pay.PUT("/:id", handlers.Pay)
+
+	rt := e.Group("/rentals")
+	rt.Use(middlewares.IsAuthenticated("both"))
+	rt.GET("", handlers.GetRentals)
+
+	ri := e.Group("/rental-item")
+	ri.Use(middlewares.IsAuthenticated("admin"))
+	ri.PUT("/:id", handlers.UpdateRentalItem)
 
 	port := os.Getenv("PORT")
 	if port == "" {

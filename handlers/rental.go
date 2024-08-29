@@ -82,3 +82,46 @@ func Pay(c echo.Context) error {
 		Data:    rental,
 	})
 }
+
+func GetRentals(c echo.Context) error {
+	userID, ok := c.Get("user_id").(float64)
+	if !ok {
+		return utils.HandleError(c, utils.NewBadRequestError("Invalid user ID"))
+	}
+
+	userRole, ok := c.Get("role").(string)
+	if !ok {
+		return utils.HandleError(c, utils.NewBadRequestError("Invalid user role"))
+	}
+
+	var rentals []models.Rental
+
+	if userRole == "user" {
+		// Convert float64 userID to uint as needed
+		uid := uint(userID)
+
+		if err := config.DB.Joins("JOIN payments ON payments.id = rentals.payment_id").
+			Joins("JOIN carts ON carts.id = payments.cart_id").
+			Where("carts.user_id = ?", uid).
+			Preload("Payment").
+			Preload("Payment.Cart").
+			Preload("RentalItems").
+			Find(&rentals).Error; err != nil {
+			return utils.HandleError(c, utils.NewInternalError("Internal server error"))
+		}
+	} else if userRole == "admin" {
+		if err := config.DB.Joins("JOIN payments ON payments.id = rentals.payment_id").
+			Joins("JOIN carts ON carts.id = payments.cart_id").
+			Preload("Payment").
+			Preload("Payment.Cart").
+			Preload("RentalItems").
+			Find(&rentals).Error; err != nil {
+			return utils.HandleError(c, utils.NewInternalError("Internal server error"))
+		}
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Message: "Success getting rentals",
+		Data:    rentals,
+	})
+}
