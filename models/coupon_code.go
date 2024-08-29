@@ -7,7 +7,7 @@ import (
 )
 
 type CouponCode struct {
-	gorm.Model
+	gorm.Model   `swaggerignore:"true"`
 	UserID       uint       `gorm:"not null;index;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:UserID;references:ID" json:"user_id"`
 	Code         string     `gorm:"type:varchar(250);not null" json:"code"`
 	Discount     int        `gorm:"type:int; not null" json:"discount"`

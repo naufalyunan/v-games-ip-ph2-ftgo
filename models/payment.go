@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type Payment struct {
-	gorm.Model
+	gorm.Model    `swaggerignore:"true"`
 	CartID        uint    `gorm:"not null;index;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CartID;references:ID" json:"cart_id"`
 	PaymentPrice  float64 `gorm:"type:float;not null;default:0;check:payment_price >= 0" json:"payment_price"`
 	PaymentStatus string  `gorm:"type:varchar(250)" json:"payment_status"`

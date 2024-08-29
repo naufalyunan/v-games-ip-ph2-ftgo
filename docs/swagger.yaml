@@ -1,0 +1,764 @@
+basePath: /
+definitions:
+  models.Cart:
+    properties:
+      cart_items:
+        items:
+          $ref: '#/definitions/models.CartItem'
+        type: array
+      total_price:
+        type: number
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Assc
+      user_id:
+        type: integer
+    type: object
+  models.CartItem:
+    properties:
+      cart_id:
+        type: integer
+      end_date:
+        type: string
+      game:
+        $ref: '#/definitions/models.Game'
+      game_id:
+        type: integer
+      quantity:
+        type: integer
+      start_date:
+        type: string
+    type: object
+  models.DLC:
+    properties:
+      description:
+        type: string
+      dlc_price:
+        type: number
+      game_id:
+        type: integer
+      name:
+        type: string
+      stock:
+        type: integer
+    type: object
+  models.DepoPayload:
+    properties:
+      amount:
+        type: number
+    type: object
+  models.Game:
+    properties:
+      DLCs:
+        items:
+          $ref: '#/definitions/models.DLC'
+        type: array
+      description:
+        type: string
+      genre:
+        type: string
+      name:
+        type: string
+      rent_price:
+        type: number
+      reviews:
+        description: Assc
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
+      stock:
+        type: integer
+      studio:
+        type: string
+    type: object
+  models.LoginPayload:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.Payment:
+    properties:
+      cart:
+        allOf:
+        - $ref: '#/definitions/models.Cart'
+        description: Assc
+      cart_id:
+        type: integer
+      coupon_code:
+        type: string
+      payment_method:
+        type: string
+      payment_price:
+        type: number
+      payment_status:
+        type: string
+      provider:
+        type: string
+    type: object
+  models.Rental:
+    properties:
+      payment:
+        allOf:
+        - $ref: '#/definitions/models.Payment'
+        description: Assc
+      payment_id:
+        type: integer
+      rental_items:
+        items:
+          $ref: '#/definitions/models.RentalItem'
+        type: array
+      status:
+        type: string
+    type: object
+  models.RentalItem:
+    properties:
+      cart_item:
+        $ref: '#/definitions/models.CartItem'
+      cart_item_id:
+        type: integer
+      rental:
+        allOf:
+        - $ref: '#/definitions/models.Rental'
+        description: Assc
+      rental_id:
+        type: integer
+      status:
+        type: string
+    type: object
+  models.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      note:
+        type: string
+    type: object
+  models.Review:
+    properties:
+      Game:
+        $ref: '#/definitions/models.Game'
+      User:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Assc
+      game_id:
+        type: integer
+      message:
+        type: string
+      rating:
+        type: number
+      user_id:
+        type: integer
+    type: object
+  models.UpdatePaymentStatusPayload:
+    properties:
+      status:
+        type: string
+    type: object
+  models.User:
+    properties:
+      deposit:
+        type: number
+      email:
+        type: string
+      full_name:
+        type: string
+      input_ref_code:
+        type: string
+      jwt_token:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
+  utils.APIError:
+    properties:
+      code:
+        type: integer
+      detail:
+        type: string
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@kedaiGame.com
+    name: API Support
+  description: Ini adalah API untuk rental video game
+  title: Kedai Game API
+  version: "1.0"
+paths:
+  /Reviews:
+    post:
+      consumes:
+      - application/json
+      description: create a new Payment
+      parameters:
+      - description: New Payment
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Payment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Create New Payment
+      tags:
+      - payments
+  /carts:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of Carts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Get Carts
+      tags:
+      - carts
+  /coupons:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all Coupons
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Get All Coupons
+      tags:
+      - coupons
+  /coupons/referral:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of Referral Code
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Get Referreal Code
+      tags:
+      - coupons
+  /games:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all games
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Get All Games
+      tags:
+      - games
+    post:
+      consumes:
+      - application/json
+      description: create a new Game
+      parameters:
+      - description: New Game
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Game'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Create New Game
+      tags:
+      - games
+  /games/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get details of a game by it's ID
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Get Game By ID
+      tags:
+      - games
+    put:
+      consumes:
+      - application/json
+      description: Update a game by it's ID
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Game
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Game'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Update Game By ID
+      tags:
+      - games
+  /items:
+    post:
+      consumes:
+      - application/json
+      description: create a cart item (adding item to cart) also create cart automatically
+      parameters:
+      - description: New Cart Iten
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.CartItem'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Create Cart Item
+      tags:
+      - cart-item
+  /pay/{id}:
+    put:
+      consumes:
+      - application/json
+      description: update field in the payments table, also create a new rental and
+        rental items automatically
+      parameters:
+      - description: Update Payment
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePaymentStatusPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Update Payment Status
+      tags:
+      - pay
+  /payments:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all payments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Get All Payments
+      tags:
+      - payments
+  /rental-item/{id}:
+    put:
+      consumes:
+      - application/json
+      description: update status field in the rental items table
+      parameters:
+      - description: Update Rental Item
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.RentalItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Update Rental Item Status
+      tags:
+      - rental-item
+  /rentals:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all rentals
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Get All Rentals
+      tags:
+      - rentals
+  /reviews:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all game reviews
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      summary: Get All Reviews
+      tags:
+      - reviews
+    post:
+      consumes:
+      - application/json
+      description: create a new Review
+      parameters:
+      - description: New Review
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Review'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Create New Review
+      tags:
+      - reviews
+  /users/depo:
+    put:
+      consumes:
+      - application/json
+      description: Update a user deposit value based on it's user ID
+      parameters:
+      - description: Depo Amount
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.DepoPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      security:
+      - BearerAuth: []
+      summary: Update Deposit Amount
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user with email and password
+      parameters:
+      - description: Login Payload
+        in: body
+        name: shipment
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "403":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      summary: Login user
+      tags:
+      - Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

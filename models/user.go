@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	gorm.Model
+	gorm.Model   `swaggerignore:"true"`
 	FullName     string  `gorm:"type:varchar(250); not null" json:"full_name"`
 	Email        string  `gorm:"type:varchar(250);uniqueIndex; not null" json:"email"`
 	Password     string  `gorm:"type:varchar(250); not null" json:"password"`

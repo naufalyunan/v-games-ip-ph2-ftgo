@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type Game struct {
-	gorm.Model
+	gorm.Model  `swaggerignore:"true"`
 	Name        string  `gorm:"type:varchar(250); not null" json:"name"`
 	Description string  `gorm:"type:varchar(250); not null" json:"description"`
 	Genre       string  `gorm:"type:varchar(250); not null" json:"genre"`

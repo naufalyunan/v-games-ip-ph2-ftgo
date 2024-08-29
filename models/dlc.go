@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type DLC struct {
-	gorm.Model
+	gorm.Model  `swaggerignore:"true"`
 	Name        string  `gorm:"type:varchar(250); not null" json:"name"`
 	Description string  `gorm:"type:varchar(250); not null" json:"description"`
 	Stock       int     `gorm:"type:int; not null" json:"stock"`

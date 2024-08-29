@@ -23,7 +23,7 @@ import (
 // @Failure 403 {object} utils.APIError "Not Found"
 // @Failure 400 {object} utils.APIError "Bad Request"
 // @Failure 500 {object} utils.APIError "Internal Server Error"
-// @Router /pay/{id} [PUT]
+// @Router /rental-item/{id} [PUT]
 func UpdateRentalItem(c echo.Context) error {
 	rentalItemID := c.Param("id")
 
