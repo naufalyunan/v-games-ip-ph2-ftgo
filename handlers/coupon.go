@@ -9,6 +9,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// @Summary Get All Coupons
+// @Description Retrieve a list of all Coupons
+// @Tags coupons
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /coupons [get]
 func GetCoupons(c echo.Context) error {
 	userID := c.Get("user_id").(float64)
 	userRole := c.Get("role")
@@ -30,6 +40,16 @@ func GetCoupons(c echo.Context) error {
 	})
 }
 
+// @Summary Get Referreal Code
+// @Description Retrieve a list of Referral Code
+// @Tags coupons
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /coupons/referral [get]
 func GetReferralCode(c echo.Context) error {
 	userID := c.Get("user_id").(float64)
 	userRole := c.Get("role")

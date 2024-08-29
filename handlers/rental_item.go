@@ -11,6 +11,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Update Rental Item Status
+// @Description update status field in the rental items table
+// @Tags rental-item
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param product body models.RentalItem true "Update Rental Item"
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /pay/{id} [PUT]
 func UpdateRentalItem(c echo.Context) error {
 	rentalItemID := c.Param("id")
 

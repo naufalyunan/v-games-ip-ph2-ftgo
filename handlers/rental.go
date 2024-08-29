@@ -11,6 +11,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Update Payment Status
+// @Description update field in the payments table, also create a new rental and rental items automatically
+// @Tags pay
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param product body models.UpdatePaymentStatusPayload true "Update Payment"
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /pay/{id} [PUT]
 func Pay(c echo.Context) error {
 	paymentID := c.Param("id")
 
@@ -87,6 +100,17 @@ func Pay(c echo.Context) error {
 	})
 }
 
+// @Summary Get All Rentals
+// @Description Retrieve a list of all rentals
+// @Tags rentals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /rentals [get]
 func GetRentals(c echo.Context) error {
 	userID, ok := c.Get("user_id").(float64)
 	if !ok {

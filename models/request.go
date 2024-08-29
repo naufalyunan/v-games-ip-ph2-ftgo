@@ -12,3 +12,7 @@ type UpdateGameStockPayload struct {
 type UpdatePaymentStatusPayload struct {
 	Status string `json:"status"`
 }
+
+type DepoPayload struct {
+	Amount float64 `json:"amount"`
+}

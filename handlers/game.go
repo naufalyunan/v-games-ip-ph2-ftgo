@@ -11,6 +11,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Get All Games
+// @Description Retrieve a list of all games
+// @Tags games
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /games [get]
 func GetGames(c echo.Context) error {
 	var games []*models.Game
 	if err := config.DB.Preload("DLCs").Preload("Reviews").Find(&games).Error; err != nil {
@@ -23,6 +33,18 @@ func GetGames(c echo.Context) error {
 	})
 }
 
+// @Summary Create New Game
+// @Description create a new Game
+// @Tags games
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param product body models.Game true "New Game"
+// @Success 201 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /games [POST]
 func CreateGame(c echo.Context) error {
 	var game models.Game
 	if err := c.Bind(&game); err != nil {
@@ -68,6 +90,18 @@ func CreateGame(c echo.Context) error {
 	})
 }
 
+// @Summary Get Game By ID
+// @Description Get details of a game by it's ID
+// @Tags games
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Game ID"
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /games/{id} [get]
 func GetGameByID(c echo.Context) error {
 	gameID := c.Param("id")
 
@@ -85,6 +119,19 @@ func GetGameByID(c echo.Context) error {
 	})
 }
 
+// @Summary Update Game By ID
+// @Description Update a game by it's ID
+// @Tags games
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Game ID"
+// @Param product body models.Game true "Update Game"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /games/{id} [PUT]
 func UpdateGameStock(c echo.Context) error {
 	gameID := c.Param("id")
 	var request models.UpdateGameStockPayload

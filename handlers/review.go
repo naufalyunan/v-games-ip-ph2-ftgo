@@ -11,6 +11,15 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Get All Reviews
+// @Description Retrieve a list of all game reviews
+// @Tags reviews
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /reviews [get]
 func GetReviews(c echo.Context) error {
 	var reviews []*models.Review
 
@@ -24,6 +33,19 @@ func GetReviews(c echo.Context) error {
 	})
 }
 
+// @Summary Create New Review
+// @Description create a new Review
+// @Tags reviews
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param product body models.Review true "New Review"
+// @Success 201 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /reviews [POST]
 func CreateReview(c echo.Context) error {
 	userID := c.Get("user_id").(float64)
 	var review models.Review

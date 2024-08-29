@@ -11,6 +11,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Create Cart Item
+// @Description create a cart item (adding item to cart) also create cart automatically
+// @Tags cart-item
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param product body models.CartItem true "New Cart Iten"
+// @Success 201 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /items [POST]
 func CreateCartItem(c echo.Context) error {
 	userID := c.Get("user_id").(float64)
 	var cartItem models.CartItem

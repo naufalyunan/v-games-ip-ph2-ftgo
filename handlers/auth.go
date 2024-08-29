@@ -17,6 +17,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Register a new user
+// @Description Register a new user with email, password, deposit, jwt_token, input_ref_code, full_name, and role
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Param shipment body models.User true "New user"
+// @Success 201 {object} models.Response
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /users/register [post]
 func Register(c echo.Context) error {
 	var user models.User
 
@@ -175,6 +185,17 @@ func Register(c echo.Context) error {
 	})
 }
 
+// @Summary Login user
+// @Description Authenticate a user with email and password
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Param shipment body models.LoginPayload true "Login Payload"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /users/register [post]
 func Login(c echo.Context) error {
 	var loginPayload models.LoginPayload
 	if err := c.Bind(&loginPayload); err != nil {

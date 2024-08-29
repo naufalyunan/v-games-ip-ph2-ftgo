@@ -9,6 +9,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// @Summary Get Carts
+// @Description Retrieve a list of Carts
+// @Tags carts
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /carts [get]
 func GetCarts(c echo.Context) error {
 	userID := c.Get("user_id").(float64)
 	userRole := c.Get("role")

@@ -12,6 +12,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Create New Payment
+// @Description create a new Payment
+// @Tags payments
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param product body models.Payment true "New Payment"
+// @Success 201 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 403 {object} utils.APIError "Not Found"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /Reviews [POST]
 func CreatePayment(c echo.Context) error {
 	userID := c.Get("user_id").(float64)
 	var payment models.Payment
@@ -114,6 +127,17 @@ func CreatePayment(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
+// @Summary Get All Payments
+// @Description Retrieve a list of all payments
+// @Tags payments
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.Response
+// @Failure 401 {object} utils.APIError "Unauthorized"
+// @Failure 400 {object} utils.APIError "Bad Request"
+// @Failure 500 {object} utils.APIError "Internal Server Error"
+// @Router /payments [get]
 func GetPayments(c echo.Context) error {
 	userID, ok := c.Get("user_id").(float64)
 	if !ok {
