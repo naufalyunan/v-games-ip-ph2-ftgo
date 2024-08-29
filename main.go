@@ -30,14 +30,23 @@ func main() {
 	r.Use(middlewares.IsAuthenticated("user"))
 	r.POST("", handlers.CreateReview)
 
-	p := e.Group("/items")
-	p.Use(middlewares.IsAuthenticated("user"))
-	p.POST("", handlers.CreateCartItem)
+	i := e.Group("/items")
+	i.Use(middlewares.IsAuthenticated("user"))
+	i.POST("", handlers.CreateCartItem)
 
 	c := e.Group("/carts")
 	//both roles can view the carts
 	c.Use(middlewares.IsAuthenticated("both"))
 	c.GET("", handlers.GetCarts)
+
+	co := e.Group("/coupons")
+	co.Use(middlewares.IsAuthenticated("both"))
+	co.GET("", handlers.GetCoupons)
+	co.GET("/referral", handlers.GetReferralCode)
+
+	p := e.Group("/payments")
+	p.Use(middlewares.IsAuthenticated("user"))
+	p.POST("/create", handlers.CreatePayment)
 
 	port := os.Getenv("PORT")
 	if port == "" {

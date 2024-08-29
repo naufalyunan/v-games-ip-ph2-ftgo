@@ -35,6 +35,21 @@ func CreateCartItem(c echo.Context) error {
 		return utils.HandleError(c, utils.NewBadRequestError("End Date must be greater than Start Date"))
 	}
 
+	//check the quantity and stock
+	// retrieve the game
+	var game models.Game
+	if err := config.DB.Where("id = ?", cartItem.GameID).First(&game).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return utils.HandleError(c, utils.NewNotFoundError("Game not found"))
+		}
+		return utils.HandleError(c, utils.NewInternalError("Internal server error"))
+	}
+
+	// then compare the stock and quantity to buy
+	if game.Stock < cartItem.Quantity {
+		return utils.HandleError(c, utils.NewBadRequestError("Not enough stock to buy"))
+	}
+
 	//check if a cart for a particular user is already exists
 	if err := config.DB.Transaction(func(tx *gorm.DB) error {
 		var cart models.Cart
@@ -66,6 +81,12 @@ func CreateCartItem(c echo.Context) error {
 			} else {
 				return utils.NewInternalError("Internal server error")
 			}
+		}
+
+		//update the cartItem new stock
+		newStock := cartItem.Game.Stock - cartItem.Quantity
+		if err := tx.Model(&cartItem.Game).Update("stock", newStock).Error; err != nil {
+			return utils.NewInternalError("Error updating game new stock after adding to cart")
 		}
 
 		duration := cartItem.CalculateDaysDifference()
