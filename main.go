@@ -47,6 +47,7 @@ func main() {
 	p := e.Group("/payments")
 	p.Use(middlewares.IsAuthenticated("user"))
 	p.POST("/create", handlers.CreatePayment)
+	p.POST("/pay", handlers.Pay)
 
 	port := os.Getenv("PORT")
 	if port == "" {
