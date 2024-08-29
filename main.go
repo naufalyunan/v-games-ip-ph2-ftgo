@@ -33,6 +33,12 @@ func main() {
 	p := e.Group("/items")
 	p.Use(middlewares.IsAuthenticated("user"))
 	p.POST("", handlers.CreateCartItem)
+
+	c := e.Group("/carts")
+	//both roles can view the carts
+	c.Use(middlewares.IsAuthenticated("both"))
+	c.GET("", handlers.GetCarts)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

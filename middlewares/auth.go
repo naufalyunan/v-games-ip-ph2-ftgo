@@ -35,19 +35,21 @@ func IsAuthenticated(role string) echo.MiddlewareFunc {
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				userRole := claims["role"].(string)
 
-				// Otorisasi berdasarkan role
-				if role == "admin" && userRole != "admin" {
-					return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for non-admin"})
-				}
+				if role != "both" {
+					// Otorisasi berdasarkan role
+					if role == "admin" && userRole != "admin" {
+						return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for non-admin"})
+					}
 
-				if role == "user" && userRole != "user" {
-					return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for admin"})
+					if role == "user" && userRole != "user" {
+						return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for admin"})
+					}
 				}
 
 				// Set token di konteks untuk digunakan di handler
 				c.Set("user_id", claims["id"])
 				c.Set("email", claims["email"])
-
+				c.Set("role", claims["role"])
 				return next(c)
 			} else {
 				return utils.HandleError(c, utils.NewUnauthorizedError("Invalid token claims"))

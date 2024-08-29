@@ -9,5 +9,5 @@ type Cart struct {
 	CartItems  []*CartItem `gorm:"foreignKey:CartID" json:"cart_items,omitempty"`
 
 	//Assc
-	User User `gorm:"foreignKey:UserID;references:ID" json:"-"`
+	User *User `gorm:"foreignKey:UserID;references:ID" json:"user,omitempty"`
 }
