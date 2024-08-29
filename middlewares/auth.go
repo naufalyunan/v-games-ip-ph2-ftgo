@@ -41,7 +41,7 @@ func IsAuthenticated(role string) echo.MiddlewareFunc {
 				}
 
 				if role == "user" && userRole != "user" {
-					return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for non-staff"})
+					return c.JSON(http.StatusForbidden, map[string]string{"message": "Access forbidden for admin"})
 				}
 
 				// Set token di konteks untuk digunakan di handler

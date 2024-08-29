@@ -29,6 +29,10 @@ func main() {
 	r.GET("", handlers.GetReviews)
 	r.Use(middlewares.IsAuthenticated("user"))
 	r.POST("", handlers.CreateReview)
+
+	p := e.Group("/items")
+	p.Use(middlewares.IsAuthenticated("user"))
+	p.POST("", handlers.CreateCartItem)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
