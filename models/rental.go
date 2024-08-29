@@ -8,6 +8,6 @@ type Rental struct {
 	PaymentID uint   `gorm:"not null;index;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PaymentID;references:ID" json:"payment_id"`
 
 	//Assc
-	Payment     Payment       `gorm:"foreignKey:PaymentID;references:ID" json:"-"`
+	Payment     *Payment      `gorm:"foreignKey:PaymentID;references:ID" json:"payment,omitempty"`
 	RentalItems []*RentalItem `gorm:"foreignKey:RentalID" json:"rental_items,omitempty"`
 }

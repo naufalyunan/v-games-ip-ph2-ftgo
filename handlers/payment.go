@@ -67,7 +67,7 @@ func CreatePayment(c echo.Context) error {
 		return utils.HandleError(c, utils.NewBadRequestError("Cannot create payment for empty cart"))
 	}
 
-	payment.Cart = cart
+	payment.Cart = &cart
 
 	fmt.Println("connecting to xendit")
 	//use xendit to pay
@@ -90,10 +90,7 @@ func CreatePayment(c echo.Context) error {
 		return utils.HandleError(c, utils.NewInternalError("Internal server error"))
 	}
 
-	//after creating payment, delete cart and discount code
-	if err := config.DB.Delete(&cart, cart.ID).Error; err != nil {
-		return utils.HandleError(c, utils.NewInternalError("Error deleting cart after creating payment"))
-	}
+	// after completing, delete discount code
 
 	if payment.CouponCode != "" {
 		if err := config.DB.Where("code = ?", payment.CouponCode).Delete(&models.CouponCode{}).Error; err != nil {

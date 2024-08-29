@@ -8,3 +8,7 @@ type LoginPayload struct {
 type UpdateGameStockPayload struct {
 	NewStock int `json:"stock"`
 }
+
+type UpdatePaymentStatusPayload struct {
+	Status string `json:"status"`
+}

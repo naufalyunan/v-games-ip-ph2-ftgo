@@ -12,5 +12,5 @@ type Payment struct {
 	CouponCode    string  `gorm:"type:varchar(250)" json:"coupon_code,omitempty"`
 
 	//Assc
-	Cart Cart `gorm:"foreignKey:CartID;references:ID" json:"cart"`
+	Cart *Cart `gorm:"foreignKey:CartID;references:ID" json:"cart"`
 }
