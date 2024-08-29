@@ -30,6 +30,10 @@ func Pay(c echo.Context) error {
 		return utils.HandleError(c, utils.NewInternalError("Internal server error"))
 	}
 
+	if payment.PaymentStatus == "PAID" {
+		return utils.HandleError(c, utils.NewBadRequestError("Cart already Paid"))
+	}
+
 	var rental models.Rental
 	if err := config.DB.Transaction(func(tx *gorm.DB) error {
 		// if valid, then update the payment status

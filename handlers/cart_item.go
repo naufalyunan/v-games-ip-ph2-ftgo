@@ -68,6 +68,24 @@ func CreateCartItem(c echo.Context) error {
 			}
 		}
 
+		//check if the cart is already requested payment and pending status, if yes, then return error
+		var payments []*models.Payment
+		uid := uint(userID)
+
+		if err := tx.Joins("JOIN carts ON carts.id = payments.cart_id").
+			Where("carts.user_id = ?", uid).
+			Where("payment_status = ?", "PENDING").
+			Preload("Cart").
+			Preload("Cart.CartItems").
+			Find(&payments).Error; err != nil {
+			return utils.NewInternalError("Internal server error")
+		}
+
+		if len(payments) > 0 && payments[0].PaymentStatus == "PENDING" && payments[0].CartID == cart.ID {
+			//if truthy then the cart is already in payment, so the item could not be added unless is paid
+			return utils.NewBadRequestError("Cart already requested payment, finish the payment first, only then can make a new cart")
+		}
+
 		// create the cartItem and assign to cart
 		cartItem.CartID = cart.ID
 		if err := tx.Create(&cartItem).Error; err != nil {

@@ -47,11 +47,11 @@ func UpdateRentalItem(c echo.Context) error {
 
 	if err := config.DB.
 		Preload("CartItem").
-		Where("rental_id = ?", rentalItem.RentalID).
+		Where("rental_id = ?", check.RentalID).
 		Find(&rentalItems).Error; err != nil {
 		return utils.NewInternalError("Error getting rental items")
 	}
-
+	// return c.JSON(http.StatusOK, rentalItems)
 	status := true
 	for _, renIt := range rentalItems {
 		if renIt.Status != "RETURNED" {
@@ -65,6 +65,14 @@ func UpdateRentalItem(c echo.Context) error {
 		if err := config.DB.Model(&rental).Where("id = ?", check.RentalID).Update("status", rentalItem.Status).Error; err != nil {
 			return utils.NewInternalError("Error updating rental item status")
 		}
+	}
+
+	//GET RENTAL ITEM FOR DISPLAY
+	if err := config.DB.Preload("Rental").Preload("CartItem").Where("id = ?", rentalItemID).First(&rentalItem).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return utils.HandleError(c, utils.NewNotFoundError("Rental Item not found"))
+		}
+		return utils.HandleError(c, utils.NewInternalError("Internal server error"))
 	}
 
 	return c.JSON(http.StatusOK, models.Response{
