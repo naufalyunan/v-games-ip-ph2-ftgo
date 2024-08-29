@@ -720,7 +720,7 @@ paths:
       summary: Update Deposit Amount
       tags:
       - users
-  /users/register:
+  /users/login:
     post:
       consumes:
       - application/json
@@ -754,6 +754,37 @@ paths:
           schema:
             $ref: '#/definitions/utils.APIError'
       summary: Login user
+      tags:
+      - Auth
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email, password, deposit, jwt_token, input_ref_code,
+        full_name, and role
+      parameters:
+      - description: New user
+        in: body
+        name: shipment
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.APIError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.APIError'
+      summary: Register a new user
       tags:
       - Auth
 securityDefinitions:

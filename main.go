@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"v-games-ip-ph2-ftgo/config"
+	_ "v-games-ip-ph2-ftgo/docs"
 	"v-games-ip-ph2-ftgo/handlers"
 	"v-games-ip-ph2-ftgo/middlewares"
 

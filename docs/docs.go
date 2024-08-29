@@ -847,7 +847,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/register": {
+        "/users/login": {
             "post": {
                 "description": "Authenticate a user with email and password",
                 "consumes": [
@@ -889,6 +889,52 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.APIError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/register": {
+            "post": {
+                "description": "Register a new user with email, password, deposit, jwt_token, input_ref_code, full_name, and role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "New user",
+                        "name": "shipment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/utils.APIError"
                         }
@@ -1216,8 +1262,6 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Ini adalah API untuk rental video game",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
 }
 
 func init() {

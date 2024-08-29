@@ -195,7 +195,7 @@ func Register(c echo.Context) error {
 // @Failure 400 {object} utils.APIError "Bad Request"
 // @Failure 403 {object} utils.APIError "Not Found"
 // @Failure 500 {object} utils.APIError "Internal Server Error"
-// @Router /users/register [post]
+// @Router /users/login [post]
 func Login(c echo.Context) error {
 	var loginPayload models.LoginPayload
 	if err := c.Bind(&loginPayload); err != nil {
