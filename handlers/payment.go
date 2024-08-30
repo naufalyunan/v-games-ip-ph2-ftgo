@@ -3,6 +3,8 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"v-games-ip-ph2-ftgo/config"
 	"v-games-ip-ph2-ftgo/models"
 	"v-games-ip-ph2-ftgo/services"
@@ -83,6 +85,7 @@ func CreatePayment(c echo.Context) error {
 	payment.Cart = &cart
 
 	fmt.Println("connecting to xendit")
+
 	//use xendit to pay
 	xenditService := services.NewXenditService()
 	resp, err := xenditService.CreateInvoice(payment, cart.User)
@@ -97,6 +100,30 @@ func CreatePayment(c echo.Context) error {
 	payment.PaymentStatus = string(resp.Invoice.Status)
 	payment.PaymentMethod = "xendit"
 	payment.Provider = "xendit"
+
+	SMTPPort := os.Getenv("SMTP_PORT")
+	SMTPPortInt, err := strconv.Atoi(SMTPPort)
+	if err != nil {
+		return utils.HandleError(c, utils.NewInternalError("Error getting SMTP Port"))
+	}
+
+	//use email service
+	emailService := services.NewEmailService(
+		os.Getenv("SMTP_SERVER"),   // SMTP server
+		SMTPPortInt,                // SMTP port
+		os.Getenv("SMTP_USERNAME"), // SMTP username
+		os.Getenv("SMTP_PASSWORD"), // SMTP password
+		os.Getenv("FROM_EMAIL"),    // From email address
+	)
+
+	err = emailService.SendEmail(
+		payment.Cart.User.Email,     // To email address
+		"Kedai Game Rental Payment", // Subject
+		fmt.Sprintf("<h1>Hello</h1><p>Below is the link to pay for your inquiry</p></br><p>%s</p>", resp.Invoice.InvoiceUrl), // Body
+	)
+	if err != nil {
+		utils.HandleError(c, utils.NewInternalError("Error sending payment email"+err.Error()))
+	}
 
 	// create payment entity
 	if err := config.DB.Create(&payment).Error; err != nil {
