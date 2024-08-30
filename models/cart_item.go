@@ -15,8 +15,8 @@ type CartItem struct {
 	gorm.Model `swaggerignore:"true"`
 	CartID     uint        `gorm:"not null;index;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CartID;references:ID" json:"cart_id"`
 	GameID     uint        `gorm:"not null;index;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:GameID;references:ID" json:"game_id"`
-	StartDate  *CustomDate `gorm:"type:datetime; not null" json:"start_date"`
-	EndDate    *CustomDate `gorm:"type:datetime; not null" json:"end_date"`
+	StartDate  *CustomDate `gorm:"type:date; not null" json:"start_date"`
+	EndDate    *CustomDate `gorm:"type:date; not null" json:"end_date"`
 	Quantity   int         `gorm:"type:int; not null" json:"quantity"`
 
 	//Assc
