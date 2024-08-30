@@ -36,7 +36,7 @@ func Pay(c echo.Context) error {
 
 	//get payment entity
 	var payment models.Payment
-	if err := config.DB.Preload("Cart.CartItems").Where("id = ?", paymentID).First(&payment).Error; err != nil {
+	if err := config.DB.Preload("Cart.User").Preload("Cart.CartItems").Where("id = ?", paymentID).First(&payment).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return utils.HandleError(c, utils.NewNotFoundError("No Payment Found"))
 		}
@@ -47,11 +47,22 @@ func Pay(c echo.Context) error {
 		return utils.HandleError(c, utils.NewBadRequestError("Cart already Paid"))
 	}
 
+	//check if deposit is enough, if not returned bad request
+	if payment.PaymentPrice > payment.Cart.User.Deposit {
+		return utils.HandleError(c, utils.NewBadRequestError("Unsufficient Balance to Pay"))
+	}
+
 	var rental models.Rental
 	if err := config.DB.Transaction(func(tx *gorm.DB) error {
 		// if valid, then update the payment status
 		if err := tx.Model(&payment).Where("id = ?", paymentID).Update("payment_status", payload.Status).Error; err != nil {
 			return utils.NewInternalError("Internal Server Error")
+		}
+
+		currentDepo := payment.Cart.User.Deposit - payment.PaymentPrice
+		//update the user 
+		if err := tx.Model(&models.User{}).Where("id = ?", payment.Cart.UserID).Update("deposit", currentDepo).Error; err != nil {
+			return utils.NewInternalError("Fail to update user's deposit value")
 		}
 
 		//create rental after updating payment
